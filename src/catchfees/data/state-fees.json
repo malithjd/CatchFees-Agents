@@ -1,0 +1,265 @@
+{
+  "AL": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [23, 23] },
+    "title": { "fee": 18 }
+  },
+  "AK": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [100, 100] },
+    "title": { "fee": 15 }
+  },
+  "AZ": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [32, 32] },
+    "title": { "fee": 4 }
+  },
+  "AR": {
+    "docFee": { "cap": 129, "capped": true, "typical": 129, "law": "Ark. Code §23-112-1001" },
+    "registration": { "method": "flat", "estimatedRange": [17, 30] },
+    "title": { "fee": 10 }
+  },
+  "CA": {
+    "docFee": { "cap": 85, "capped": true, "typical": 85, "law": "CA Civil Code §4456.5" },
+    "registration": { "method": "weight", "estimatedRange": [46, 65] },
+    "title": { "fee": 23 }
+  },
+  "CO": {
+    "docFee": { "cap": null, "capped": false, "typical": 699, "law": null },
+    "registration": { "method": "age+weight", "estimatedRange": [50, 120] },
+    "title": { "fee": 7 }
+  },
+  "CT": {
+    "docFee": { "cap": null, "capped": false, "typical": 599, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [120, 120] },
+    "title": { "fee": 25 }
+  },
+  "DE": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [40, 40] },
+    "title": { "fee": 55 }
+  },
+  "DC": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "weight", "estimatedRange": [72, 175] },
+    "title": { "fee": 26 }
+  },
+  "FL": {
+    "docFee": { "cap": null, "capped": false, "typical": 699, "law": null },
+    "registration": { "method": "weight", "estimatedRange": [28, 48] },
+    "title": { "fee": 75 }
+  },
+  "GA": {
+    "docFee": { "cap": null, "capped": false, "typical": 699, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [20, 20] },
+    "title": { "fee": 18 }
+  },
+  "HI": {
+    "docFee": { "cap": null, "capped": false, "typical": 395, "law": null },
+    "registration": { "method": "weight", "estimatedRange": [34, 75] },
+    "title": { "fee": 5 }
+  },
+  "ID": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "age+value", "estimatedRange": [45, 69] },
+    "title": { "fee": 14 }
+  },
+  "IL": {
+    "docFee": { "cap": 321.57, "capped": true, "typical": 321.57, "law": "815 ILCS 306/1" },
+    "registration": { "method": "flat", "estimatedRange": [151, 164] },
+    "title": { "fee": 150 }
+  },
+  "IN": {
+    "docFee": { "cap": null, "capped": false, "typical": 199, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [21, 30] },
+    "title": { "fee": 15 }
+  },
+  "IA": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "weight+value", "estimatedRange": [50, 300] },
+    "title": { "fee": 25 }
+  },
+  "KS": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "weight+age", "estimatedRange": [39, 59] },
+    "title": { "fee": 10 }
+  },
+  "KY": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [21, 21] },
+    "title": { "fee": 9 }
+  },
+  "LA": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [20, 82] },
+    "title": { "fee": 68 }
+  },
+  "ME": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [35, 35] },
+    "title": { "fee": 33 }
+  },
+  "MD": {
+    "docFee": { "cap": null, "capped": false, "typical": 500, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [135, 187] },
+    "title": { "fee": 100 }
+  },
+  "MA": {
+    "docFee": { "cap": null, "capped": false, "typical": 495, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [60, 60] },
+    "title": { "fee": 75 }
+  },
+  "MI": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "value+weight", "estimatedRange": [100, 250] },
+    "title": { "fee": 15 }
+  },
+  "MN": {
+    "docFee": { "cap": 125, "capped": true, "typical": 125, "law": "MN Stat. §168.27" },
+    "registration": { "method": "value+age", "estimatedRange": [35, 189] },
+    "title": { "fee": 8 }
+  },
+  "MS": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "value", "estimatedRange": [14, 50] },
+    "title": { "fee": 9 }
+  },
+  "MO": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "horsepower", "estimatedRange": [24, 51] },
+    "title": { "fee": 8 }
+  },
+  "MT": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "age", "estimatedRange": [87, 217] },
+    "title": { "fee": 12 }
+  },
+  "NE": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "value+weight", "estimatedRange": [15, 75] },
+    "title": { "fee": 10 }
+  },
+  "NV": {
+    "docFee": { "cap": null, "capped": false, "typical": 599, "law": null },
+    "registration": { "method": "value", "estimatedRange": [33, 33] },
+    "title": { "fee": 29 }
+  },
+  "NH": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "weight", "estimatedRange": [31, 53] },
+    "title": { "fee": 25 }
+  },
+  "NJ": {
+    "docFee": { "cap": null, "capped": false, "typical": 599, "law": null },
+    "registration": { "method": "weight", "estimatedRange": [35, 84] },
+    "title": { "fee": 60 }
+  },
+  "NM": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "age+weight", "estimatedRange": [27, 62] },
+    "title": { "fee": 5 }
+  },
+  "NY": {
+    "docFee": { "cap": 175, "capped": true, "typical": 175, "law": "NY VTL §398-f" },
+    "registration": { "method": "weight", "estimatedRange": [26, 140] },
+    "title": { "fee": 50 }
+  },
+  "NC": {
+    "docFee": { "cap": null, "capped": false, "typical": 699, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [38, 38] },
+    "title": { "fee": 56 }
+  },
+  "ND": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "weight+age", "estimatedRange": [49, 274] },
+    "title": { "fee": 5 }
+  },
+  "OH": {
+    "docFee": {
+      "cap": 398,
+      "capped": true,
+      "percentCap": 0.10,
+      "capType": "lesser-of",
+      "typical": 250,
+      "law": "Ohio Admin Code 109:4-3-16",
+      "lawSummary": "Ohio law caps the doc fee at the lesser of $398 or 10% of the vehicle's cash price."
+    },
+    "registration": { "method": "flat", "estimatedRange": [31, 31] },
+    "title": { "fee": 15 }
+  },
+  "OK": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "value+age", "estimatedRange": [15, 95] },
+    "title": { "fee": 11 }
+  },
+  "OR": {
+    "docFee": { "cap": null, "capped": false, "typical": 599, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [122, 306] },
+    "title": { "fee": 77 }
+  },
+  "PA": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [38, 38] },
+    "title": { "fee": 58 }
+  },
+  "RI": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [30, 30] },
+    "title": { "fee": 50 }
+  },
+  "SC": {
+    "docFee": { "cap": null, "capped": false, "typical": 699, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [40, 40] },
+    "title": { "fee": 15 }
+  },
+  "SD": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "weight+age", "estimatedRange": [36, 144] },
+    "title": { "fee": 10 }
+  },
+  "TN": {
+    "docFee": { "cap": null, "capped": false, "typical": 599, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [26, 26] },
+    "title": { "fee": 14 }
+  },
+  "TX": {
+    "docFee": { "cap": 150, "capped": true, "typical": 150, "law": "TX Occ. Code §2301.553" },
+    "registration": { "method": "flat", "estimatedRange": [51, 54] },
+    "title": { "fee": 33 }
+  },
+  "UT": {
+    "docFee": { "cap": null, "capped": false, "typical": 499, "law": null },
+    "registration": { "method": "age", "estimatedRange": [44, 150] },
+    "title": { "fee": 6 }
+  },
+  "VT": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [76, 76] },
+    "title": { "fee": 35 }
+  },
+  "VA": {
+    "docFee": { "cap": 599, "capped": true, "typical": 599, "law": "VA Code §46.2-1530" },
+    "registration": { "method": "flat", "estimatedRange": [30, 45] },
+    "title": { "fee": 15 }
+  },
+  "WA": {
+    "docFee": { "cap": 200, "capped": true, "typical": 200, "law": "RCW §46.17.025(1)(b)" },
+    "registration": { "method": "weight", "estimatedRange": [30, 93] },
+    "title": { "fee": 15 }
+  },
+  "WV": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [51, 51] },
+    "title": { "fee": 15 }
+  },
+  "WI": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "flat", "estimatedRange": [85, 85] },
+    "title": { "fee": 165 }
+  },
+  "WY": {
+    "docFee": { "cap": null, "capped": false, "typical": 399, "law": null },
+    "registration": { "method": "value+age", "estimatedRange": [30, 90] },
+    "title": { "fee": 15 }
+  }
+}
