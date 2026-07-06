@@ -1,0 +1,143 @@
+:root {
+  /* Colors */
+  --bg-color: #e0e5ec;
+  --text-ink: #3a4256;
+  --accent-color: #f5c518;
+  --accent-hover: #e0b415;
+  --success-color: #2ed573;
+  --error-color: #ff4757;
+  
+  /* Neumorphic Shadows */
+  --shadow-light: #ffffff;
+  --shadow-dark: #a3b1c6;
+  
+  /* Drop Shadows (Extruded) */
+  --neo-shadow: 
+    9px 9px 16px var(--shadow-dark), 
+    -9px -9px 16px var(--shadow-light);
+  
+  --neo-shadow-hover: 
+    12px 12px 20px var(--shadow-dark), 
+    -12px -12px 20px var(--shadow-light);
+
+  --neo-shadow-sm:
+    5px 5px 10px var(--shadow-dark), 
+    -5px -5px 10px var(--shadow-light);
+
+  /* Inset Shadows (Pressed/Recessed) */
+  --neo-inset: 
+    inset 6px 6px 10px var(--shadow-dark), 
+    inset -6px -6px 10px var(--shadow-light);
+  
+  /* Radii */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-round: 50%;
+  
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 8rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-md);
+}
+
+.neo-card {
+  background-color: var(--bg-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neo-shadow);
+  padding: var(--space-md);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.neo-card-recessed {
+  background-color: var(--bg-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neo-inset);
+  padding: var(--space-md);
+}
+
+.neo-button {
+  background-color: var(--bg-color);
+  color: var(--text-ink);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--neo-shadow);
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.neo-button:hover {
+  box-shadow: var(--neo-shadow-hover);
+}
+
+.neo-button:active {
+  box-shadow: var(--neo-inset);
+}
+
+.neo-button-primary {
+  color: #fff;
+  background-color: var(--accent-color);
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+}
+.neo-button-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.neo-input {
+  width: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-ink);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 1rem;
+  box-shadow: var(--neo-inset);
+  outline: none;
+  font-family: inherit;
+}
+
+.neo-input::placeholder {
+  color: #8a96a8;
+}
+
+/* Layouts */
+.app-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+@media (min-width: 1024px) {
+  .app-section {
+    grid-template-columns: 1fr 1fr;
+  }
+}

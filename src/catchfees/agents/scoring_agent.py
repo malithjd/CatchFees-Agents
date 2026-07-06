@@ -103,7 +103,7 @@ def score_deal_tool(tool_context: ToolContext, deal_json: str) -> str:
             condition=condition,
             mileage=data.get("mileage"),
             state=data.get("state"),
-            zip_code=data.get("zip_code") or data.get("zip"),
+            zip=data.get("zip_code") or data.get("zip"),
             price=float(data["price"]),
             down=float(data.get("down", 0)),
             trade_in=float(data.get("trade_in", 0)),

@@ -7,3 +7,6 @@ dist/
 *.DS_Store
 .DS_Store
 **/.adk/
+test_out.txt
+*.evalset.json
+!evals/*.evalset.json

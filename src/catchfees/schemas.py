@@ -91,12 +91,12 @@ class MarketRef(BaseModel):
     """
 
     source: MarketSource = Field(..., description="Origin of the market reference value")
-    estimated: float | None = Field(None, description="Best single-point fair value estimate in USD")
-    low: float | None = Field(None, description="Low end of the market price range")
-    high: float | None = Field(None, description="High end of the market price range")
-    base_msrp: float | None = Field(None, description="Factory MSRP of the base/matched trim")
-    listing_count: int = Field(0, description="Number of live listings used (0 for calculated)")
-    has_live_data: bool = Field(False, description="True when live listing data was used")
+    estimated: float | None = Field(default=None, description="Best single-point fair value estimate in USD")
+    low: float | None = Field(default=None, description="Low end of the market price range")
+    high: float | None = Field(default=None, description="High end of the market price range")
+    base_msrp: float | None = Field(default=None, description="Factory MSRP of the base/matched trim")
+    listing_count: int = Field(default=0, description="Number of live listings used (0 for calculated)")
+    has_live_data: bool = Field(default=False, description="True when live listing data was used")
 
 
 class DocFeeCapInfo(BaseModel):
@@ -125,7 +125,7 @@ class ScoreFactor(BaseModel):
     name: str = Field(..., description="Human-readable factor name")
     points: float = Field(..., description="Points awarded (can be negative)")
     max: float = Field(..., description="Maximum possible points for this factor")
-    note: str | None = Field(None, description="Explanatory note (e.g., 'Cash deal — no financing')")
+    note: str | None = Field(default=None, description="Explanatory note (e.g., 'Cash deal — no financing')")
     # Factor-specific diagnostic fields (optional — present when relevant)
     ratio: float | None = None           # price / market.estimated
     apr: float | None = None
@@ -139,7 +139,7 @@ class ScoreFactor(BaseModel):
 class Flag(BaseModel):
     """A red or green flag surfaced to the user about the deal."""
 
-    severity: str | None = Field(None, description="'critical' | 'warning' | None (green flags)")
+    severity: str | None = Field(default=None, description="'critical' | 'warning' | None (green flags)")
     title: str
     detail: str
     action: str | None = None
@@ -151,7 +151,7 @@ class NegotiationScript(BaseModel):
 
     issue: str = Field(..., description="Short label for what this script addresses")
     script: str = Field(..., description="Verbatim script the buyer can say at the dealership")
-    source: str | None = Field(None, description="'live-listings' | 'calculated' (for price scripts)")
+    source: str | None = Field(default=None, description="'live-listings' | 'calculated' (for price scripts)")
 
 
 class IssueDebate(BaseModel):
@@ -203,7 +203,7 @@ class DealInput(BaseModel):
 
     # Geography
     state: str | None = Field(None, description="Two-letter USPS state code (e.g. 'CA')")
-    zip_code: str | None = Field(None, alias="zip", description="5-digit ZIP code")
+    zip_code: str | None = Field(default=None, alias="zip", description="5-digit ZIP code")
 
     # Financials
     price: float = Field(..., gt=0, description="Agreed vehicle price in USD")

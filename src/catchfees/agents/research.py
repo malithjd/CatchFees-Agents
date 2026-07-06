@@ -134,11 +134,11 @@ RULES:
 - Do NOT compute tax amounts yourself — just report the rates.
 """
 
-# Build MCP toolset connection params — uses uv to run the server
+# Build MCP toolset connection params — uses the current python executable
 _mcp_connection = StdioConnectionParams(
     server_params=StdioServerParameters(
-        command="uv",
-        args=["run", "python", _MCP_SERVER_PATH],
+        command=sys.executable,
+        args=[_MCP_SERVER_PATH],
     ),
 )
 

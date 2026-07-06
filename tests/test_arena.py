@@ -21,6 +21,8 @@ async def test_negotiation_arena_skips_if_no_score_result():
     assert any("No score result found" in e.content.parts[0].text for e in events)
 
 
+from unittest.mock import patch
+
 @pytest.mark.asyncio
 async def test_negotiation_arena_mocked_deal():
     """Test the negotiation arena with the good_price_junk_fi_rav4 case."""
@@ -90,18 +92,38 @@ async def test_negotiation_arena_mocked_deal():
     
     from google.genai import types as genai_types
     msg = genai_types.Content(parts=[genai_types.Part(text="start")], role="user")
-    events = [e async for e in runner.run_async(session_id="test_arena", user_id="test", new_message=msg)]
-    
-    for e in events:
-        if hasattr(e, 'content') and e.content:
-            print(e.content.parts[0].text)
+    async def mock_debate_loop_run_async(ctx: InvocationContext):
+        from google.genai import types as genai_types
+        from google.adk.events import Event, EventActions
+        
+        issue_text = ctx.session.state.get("current_issue", "Unknown")
+        ctx.session.state["dealer_pushback"] = f"Mocked dealer pushback for {issue_text}"
+        ctx.session.state["referee_result"] = json.dumps({
+            "conceded": True,
+            "winning_script": f"Mocked winning script for {issue_text}",
+            "dealer_pushback": f"Mocked dealer pushback for {issue_text}"
+        })
+        
+        yield Event(author="debate_loop", content=genai_types.Content(parts=[genai_types.Part(text=f"Mocked debate for {issue_text}")]))
+        yield Event(
+            author="referee_agent",
+            content=genai_types.Content(parts=[genai_types.Part(text="Mocked referee output")])
+        )
+
+    with patch('catchfees.agents.negotiation_arena.debate_loop._run_async_impl', new=mock_debate_loop_run_async):
+        events = [e async for e in runner.run_async(session_id="test_arena", user_id="test", new_message=msg)]
+        
+        for e in events:
+            if hasattr(e, 'content') and e.content:
+                print(e.content.parts[0].text)
     
     # 5. Assertions
     # Did it finish?
-    assert any("Arena negotiation complete" in getattr(e, 'content', None) and e.content.parts[0].text for e in events)
+    assert any(hasattr(e, 'content') and e.content and "Arena negotiation complete" in e.content.parts[0].text for e in events)
     
     # Check the result
-    arena_result_raw = session.state.get("arena_result")
+    updated_session = await runner.session_service.get_session(session_id="test_arena", app_name="agents", user_id="test")
+    arena_result_raw = updated_session.state.get("arena_result")
     assert arena_result_raw is not None
     arena_result = ArenaResult.model_validate(arena_result_raw)
     

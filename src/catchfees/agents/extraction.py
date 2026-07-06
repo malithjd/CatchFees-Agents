@@ -31,7 +31,7 @@ from typing import Any
 
 from google.adk.agents import LlmAgent, LoopAgent, BaseAgent, Agent
 from google.adk.agents.invocation_context import InvocationContext
-from google.adk.events import Event
+from google.adk.events import Event, EventActions
 from google.genai import types as genai_types
 
 from catchfees.tools.vin import vin_checksum, nhtsa_decode
@@ -231,7 +231,7 @@ class EscalationChecker(BaseAgent):
                 content=genai_types.Content(
                     parts=[genai_types.Part(text="Deal data verified as consistent. Proceeding to research phase.")]
                 ),
-                actions=genai_types.EventActions(escalate=True),
+                actions=EventActions(escalate=True),
             )
         else:
             # Store correction notes for the next extractor pass
