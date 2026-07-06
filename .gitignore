@@ -10,3 +10,4 @@ dist/
 test_out.txt
 *.evalset.json
 !evals/*.evalset.json
+.agent/skills/ui-ux-pro-max/
