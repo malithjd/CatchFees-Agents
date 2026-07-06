@@ -140,6 +140,9 @@ async def _run_agent_stream(session_id: str, msg: genai_types.Content) -> AsyncG
         )
         arena_result = session.state.get("arena_result", {})
         score_result = session.state.get("score_result", {})
+        # LLM-emitted prose — pass through as-is, never parsed as models.
+        score_narrative = session.state.get("score_narrative", "")
+        financial_advice = session.state.get("financial_advice", "")
         
         # If it's a string from JSON serialization, parse it
         if isinstance(arena_result, str):
@@ -160,7 +163,9 @@ async def _run_agent_stream(session_id: str, msg: genai_types.Content) -> AsyncG
                 "type": "done",
                 "report": {
                     "arena_result": arena_result,
-                    "score_result": score_result
+                    "score_result": score_result,
+                    "score_narrative": score_narrative,
+                    "financial_advice": financial_advice
                 }
             })
         }

@@ -47,7 +47,12 @@ async def test_analyze_text_endpoint(monkeypatch):
     with patch.object(runner, 'run_async', new=mock_run_async):
         # We also need to mock get_session so it doesn't fail trying to look up the UUID
         class MockSession:
-            state = {"arena_result": {"debates": [], "counterfactual": None}, "score_result": {"factors": {}}}
+            state = {
+                "arena_result": {"debates": [], "counterfactual": None},
+                "score_result": {"factors": {}},
+                "score_narrative": "The deal scores 12/100 — walk away.",
+                "financial_advice": "This fails the 20/4/10 rule.",
+            }
             
         with patch.object(runner.session_service, 'get_session', return_value=MockSession()):
             # Mock create_session so it doesn't error
@@ -72,6 +77,12 @@ async def test_analyze_text_endpoint(monkeypatch):
                     done_data = json.loads(data_lines[1].replace("data: ", ""))
                     assert done_data["type"] == "done"
                     assert "report" in done_data
+                    report = done_data["report"]
+                    assert "arena_result" in report
+                    assert "score_result" in report
+                    # Prose fields are LLM text — passed through as-is.
+                    assert report["score_narrative"] == "The deal scores 12/100 — walk away."
+                    assert report["financial_advice"] == "This fails the 20/4/10 rule."
 
 @pytest.mark.asyncio
 async def test_session_retrieval_returns_session():

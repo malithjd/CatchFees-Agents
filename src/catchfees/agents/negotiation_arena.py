@@ -140,8 +140,8 @@ class DebateEscalationChecker(BaseAgent):
             if isinstance(result_raw, str):
                 clean = result_raw.strip()
                 if clean.startswith("```"):
-                    lines = [ln for ln in clean.split("\\n") if not ln.strip().startswith("```")]
-                    clean = "\\n".join(lines)
+                    lines = [ln for ln in clean.split("\n") if not ln.strip().startswith("```")]
+                    clean = "\n".join(lines)
                 result = json.loads(clean)
             else:
                 result = result_raw
@@ -252,6 +252,13 @@ class NegotiationArena(BaseAgent):
             
             # Execute the inner loop
             async for event in debate_loop.run_async(inner_ctx):
+                # The outer Runner commits output_key state_deltas to the OUTER
+                # session — a bare inner Session never receives them. Mirror each
+                # delta here so instruction templates ({dealer_pushback?}), the
+                # escalation checker, and the extraction below all see this
+                # issue's outputs instead of empty defaults.
+                if event.actions and event.actions.state_delta:
+                    inner_session.state.update(event.actions.state_delta)
                 yield event
                 
             # Extract results from the inner session state
@@ -262,8 +269,8 @@ class NegotiationArena(BaseAgent):
                 if isinstance(result_raw, str):
                     clean = result_raw.strip()
                     if clean.startswith("```"):
-                        lines = [ln for ln in clean.split("\\n") if not ln.strip().startswith("```")]
-                        clean = "\\n".join(lines)
+                        lines = [ln for ln in clean.split("\n") if not ln.strip().startswith("```")]
+                        clean = "\n".join(lines)
                     result = json.loads(clean)
                 else:
                     result = result_raw

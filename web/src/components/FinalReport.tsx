@@ -63,7 +63,7 @@ const ScoreDial = ({ score }: { score: number }) => {
 export function FinalReport({ report }: FinalReportProps) {
   if (!report) return null;
 
-  const { arena_result, score_result } = report;
+  const { arena_result, score_result, score_narrative, financial_advice } = report;
   const cf = arena_result?.counterfactual;
   const debates = arena_result?.debates || [];
   const factors = score_result?.factors || [];
@@ -198,6 +198,20 @@ export function FinalReport({ report }: FinalReportProps) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* PROSE REPORTS */}
+      {score_narrative && (
+        <div className="neo-card">
+          <h3 style={{ marginBottom: '1rem' }}>Score Breakdown Narrative</h3>
+          <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{score_narrative}</p>
+        </div>
+      )}
+      {financial_advice && (
+        <div className="neo-card">
+          <h3 style={{ marginBottom: '1rem' }}>Financial Advisor Assessment</h3>
+          <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{financial_advice}</p>
         </div>
       )}
     </div>

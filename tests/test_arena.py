@@ -156,3 +156,173 @@ async def test_negotiation_arena_mocked_deal():
     assert cf.estimated_savings > 0
     # Addons alone were $4497. Doc fee savings = 599 - 150 = 449. Total = 4946 + interest savings.
     assert cf.estimated_savings >= 4946.0
+
+
+@pytest.mark.asyncio
+async def test_referee_result_in_markdown_fences_still_parses():
+    """Gemini often wraps the referee JSON in ```json fences. The arena must
+    strip real-newline fences so citation/conceded survive instead of
+    silently falling back to defaults (regression: split on literal '\\n')."""
+    from catchfees.agents.negotiation_arena import DebateEscalationChecker
+
+    score_result = ScoreResult(
+        score=10,
+        label="Poor Deal — Walk Away",
+        factors=[],
+        red_flags=[
+            Flag(severity="critical", title="Doc Fee Exceeds Legal Cap", detail="Doc fee is $800.", negotiable=True),
+        ],
+        green_flags=[],
+        market_ref=MarketRef(source=MarketSource.CALCULATED, estimated=28000, low=26000, high=30000, base_msrp=30000, listing_count=0, has_live_data=False),
+        doc_fee_cap=DocFeeCapInfo(has_cap=True, effective_cap=85.0),
+    )
+
+    app = App(name="agents", root_agent=negotiation_arena)
+    runner = InMemoryRunner(app=app)
+    await runner.session_service.create_session(session_id="test_fences", app_name="agents", user_id="test")
+    state = runner.session_service.sessions["agents"]["test"]["test_fences"].state
+    state["score_result"] = score_result.model_dump()
+    state["compliance_data"] = json.dumps({"doc_fee": {"citation": "Cal. Veh. Code § 11713.1(a)"}})
+
+    fenced = "```json\n" + json.dumps({
+        "winning_script": "The CA doc fee cap is $85 — please reduce it.",
+        "citation": "Cal. Veh. Code § 11713.1(a)",
+        "conceded": True,
+    }) + "\n```"
+
+    async def mock_debate_loop_run_async(ctx: InvocationContext):
+        from google.adk.events import Event
+        from google.genai import types as genai_types
+        ctx.session.state["dealer_pushback"] = "Everyone charges that."
+        ctx.session.state["referee_result"] = fenced
+        yield Event(author="debate_loop", content=genai_types.Content(parts=[genai_types.Part(text="mock")]))
+
+    from google.genai import types as genai_types
+    msg = genai_types.Content(parts=[genai_types.Part(text="start")], role="user")
+    with patch('catchfees.agents.negotiation_arena.debate_loop._run_async_impl', new=mock_debate_loop_run_async):
+        [e async for e in runner.run_async(session_id="test_fences", user_id="test", new_message=msg)]
+
+    updated = await runner.session_service.get_session(session_id="test_fences", app_name="agents", user_id="test")
+    arena_result = ArenaResult.model_validate(updated.state["arena_result"])
+    assert len(arena_result.debates) == 1
+    debate = arena_result.debates[0]
+    assert debate.citation == "Cal. Veh. Code § 11713.1(a)"
+    assert debate.conceded is True
+    assert debate.winning_script == "The CA doc fee cap is $85 — please reduce it."
+
+    # The escalation checker must parse the same fenced payload as conceded.
+    checker = DebateEscalationChecker(name="checker")
+    session = Session(id="s", app_name="agents", user_id="test")
+    session.state["referee_result"] = fenced
+    ctx = InvocationContext(
+        session=session,
+        agent=checker,
+        invocation_id="inv",
+        session_service=runner.session_service,
+    )
+    events = [e async for e in checker._run_async_impl(ctx)]
+    assert any(e.actions and e.actions.escalate for e in events), "Fenced conceded=true must escalate the loop"
+
+
+@pytest.mark.asyncio
+async def test_compliance_data_string_passes_through_to_debate():
+    """compliance_data is an LLM-emitted JSON *string* (output_key of the
+    compliance agent). The arena must seed it into the inner debate session
+    verbatim — never re-parse it as a model."""
+    compliance_str = json.dumps({
+        "results": [{"fee": "doc_fee", "citation": "Cal. Veh. Code § 11713.1(a)", "cap": 85.0}]
+    })
+
+    score_result = ScoreResult(
+        score=10,
+        label="Poor Deal — Walk Away",
+        factors=[],
+        red_flags=[Flag(severity="critical", title="Doc Fee Exceeds Legal Cap", detail="Doc fee is $800.", negotiable=True)],
+        green_flags=[],
+        market_ref=MarketRef(source=MarketSource.CALCULATED, estimated=28000, low=26000, high=30000, base_msrp=30000, listing_count=0, has_live_data=False),
+        doc_fee_cap=DocFeeCapInfo(has_cap=True, effective_cap=85.0),
+    )
+
+    app = App(name="agents", root_agent=negotiation_arena)
+    runner = InMemoryRunner(app=app)
+    await runner.session_service.create_session(session_id="test_pass", app_name="agents", user_id="test")
+    state = runner.session_service.sessions["agents"]["test"]["test_pass"].state
+    state["score_result"] = score_result.model_dump()
+    state["compliance_data"] = compliance_str
+
+    seen = {}
+
+    async def mock_debate_loop_run_async(ctx: InvocationContext):
+        from google.adk.events import Event
+        from google.genai import types as genai_types
+        seen["compliance_data"] = ctx.session.state.get("compliance_data")
+        ctx.session.state["referee_result"] = '{"winning_script": "x", "citation": null, "conceded": true}'
+        yield Event(author="debate_loop", content=genai_types.Content(parts=[genai_types.Part(text="mock")]))
+
+    from google.genai import types as genai_types
+    msg = genai_types.Content(parts=[genai_types.Part(text="start")], role="user")
+    with patch('catchfees.agents.negotiation_arena.debate_loop._run_async_impl', new=mock_debate_loop_run_async):
+        [e async for e in runner.run_async(session_id="test_pass", user_id="test", new_message=msg)]
+
+    assert seen["compliance_data"] == compliance_str, "compliance_data string must pass through unmodified"
+
+
+@pytest.mark.asyncio
+async def test_inner_debate_state_deltas_reach_arena_extraction():
+    """Regression: at runtime, LlmAgent output_key values arrive as
+    EventActions.state_delta committed by the OUTER runner — the arena's bare
+    inner Session never receives them. The arena must mirror bubbled deltas
+    onto the inner session so per-issue extraction reads real values, not
+    'No pushback.' / 'Stand firm on this point.' defaults."""
+    from google.adk.events import Event, EventActions
+    from google.genai import types as genai_types
+
+    score_result = ScoreResult(
+        score=0,
+        label="Poor Deal — Walk Away",
+        factors=[],
+        red_flags=[Flag(severity="critical", title="Doc Fee Exceeds Legal Cap", detail="Doc fee is $800.", negotiable=True)],
+        green_flags=[],
+        market_ref=MarketRef(source=MarketSource.CALCULATED, estimated=28000, low=26000, high=30000, base_msrp=30000, listing_count=0, has_live_data=False),
+        doc_fee_cap=DocFeeCapInfo(has_cap=True, effective_cap=85.0),
+    )
+
+    app = App(name="agents", root_agent=negotiation_arena)
+    runner = InMemoryRunner(app=app)
+    await runner.session_service.create_session(session_id="test_delta", app_name="agents", user_id="test")
+    state = runner.session_service.sessions["agents"]["test"]["test_delta"].state
+    state["score_result"] = score_result.model_dump()
+    state["compliance_data"] = json.dumps({"doc_fee_legal_citation": "CA Civil Code §4456.5"})
+
+    referee_payload = json.dumps({
+        "winning_script": "CA law caps the doc fee at $85 — remove the $715 overage.",
+        "citation": "CA Civil Code §4456.5",
+        "conceded": True,
+    })
+
+    async def mock_debate_loop_run_async(ctx: InvocationContext):
+        # Emit values ONLY via state_delta, exactly like real LlmAgent output_key.
+        yield Event(
+            author="dealer_agent",
+            content=genai_types.Content(parts=[genai_types.Part(text="Everyone charges that.")]),
+            actions=EventActions(state_delta={"dealer_pushback": "Everyone charges that."}),
+        )
+        yield Event(
+            author="referee_agent",
+            content=genai_types.Content(parts=[genai_types.Part(text=referee_payload)]),
+            actions=EventActions(state_delta={"referee_result": referee_payload}),
+        )
+
+    from google.genai import types as gt
+    msg = gt.Content(parts=[gt.Part(text="start")], role="user")
+    with patch('catchfees.agents.negotiation_arena.debate_loop._run_async_impl', new=mock_debate_loop_run_async):
+        [e async for e in runner.run_async(session_id="test_delta", user_id="test", new_message=msg)]
+
+    updated = await runner.session_service.get_session(session_id="test_delta", app_name="agents", user_id="test")
+    arena_result = ArenaResult.model_validate(updated.state["arena_result"])
+    assert len(arena_result.debates) == 1
+    debate = arena_result.debates[0]
+    assert debate.dealer_pushback == "Everyone charges that."
+    assert debate.citation == "CA Civil Code §4456.5"
+    assert debate.conceded is True
+    assert debate.winning_script == "CA law caps the doc fee at $85 — remove the $715 overage."
