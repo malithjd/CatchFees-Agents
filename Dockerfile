@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY mcp_servers/ mcp_servers/
 COPY web/dist/ web/dist/
 
 # Install dependencies via uv
-RUN uv sync --frozen
+RUN uv sync --no-dev
 
 # Set the host and port for FastAPI
 ENV HOST=0.0.0.0
