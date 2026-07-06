@@ -124,6 +124,9 @@ def score_deal_tool(tool_context: ToolContext, deal_json: str) -> str:
     # Call the deterministic scoring engine — ALL arithmetic happens here
     result = score_deal(deal)
 
+    # Python persists structured data, LLMs never round-trip it.
+    tool_context.state["deal_input"] = deal.model_dump()
+    
     # Deterministic results are persisted by Python, never reconstructed from LLM text.
     tool_context.state["score_result"] = result.model_dump()
 

@@ -86,9 +86,9 @@ async def test_negotiation_arena_mocked_deal():
     runner = InMemoryRunner(app=app)
     
     session = await runner.session_service.create_session(session_id="test_arena", app_name="agents", user_id="test")
-    runner.session_service.sessions["agents"]["test"]["test_arena"].state["extracted_deal"] = deal_raw
+    runner.session_service.sessions["agents"]["test"]["test_arena"].state["deal_input"] = deal_raw
     runner.session_service.sessions["agents"]["test"]["test_arena"].state["score_result"] = score_result.model_dump()
-    runner.session_service.sessions["agents"]["test"]["test_arena"].state["compliance_info"] = {}
+    runner.session_service.sessions["agents"]["test"]["test_arena"].state["compliance_data"] = {}
     
     from google.genai import types as genai_types
     msg = genai_types.Content(parts=[genai_types.Part(text="start")], role="user")
@@ -101,7 +101,8 @@ async def test_negotiation_arena_mocked_deal():
         ctx.session.state["referee_result"] = json.dumps({
             "conceded": True,
             "winning_script": f"Mocked winning script for {issue_text}",
-            "dealer_pushback": f"Mocked dealer pushback for {issue_text}"
+            "dealer_pushback": f"Mocked dealer pushback for {issue_text}",
+            "citation": "Colo. Rev. Stat. § 12-6-118" if "Doc" in issue_text else None
         })
         
         yield Event(author="debate_loop", content=genai_types.Content(parts=[genai_types.Part(text=f"Mocked debate for {issue_text}")]))
@@ -135,10 +136,15 @@ async def test_negotiation_arena_mocked_deal():
     assert "High Total Add-ons" in debated_issues
     assert "Non-Negotiable Factor" not in debated_issues
     
-    # Assert that ArenaResult has a script per issue
+    # Assert that ArenaResult has a script per issue and check citation for doc fee
+    doc_fee_citation_found = False
     for debate in arena_result.debates:
         assert debate.winning_script is not None
         assert debate.dealer_pushback is not None
+        if "Doc" in debate.issue and debate.citation:
+            doc_fee_citation_found = True
+            
+    assert doc_fee_citation_found, "At least one debate must carry a non-null citation for a doc-fee flag case."
         
     # Assert the counterfactual score is higher
     cf = arena_result.counterfactual

@@ -83,6 +83,8 @@ TASK: Counter the dealer's justification with specific numbers, legal citations
 the buyer should say to win the argument.
 
 RULES:
+- Every argument must reference the SPECIFIC fee name, dollar amount, and — when the compliance results contain one for that fee type — the legal citation verbatim. 
+- Never invent a citation; if none exists for the issue, argue from the market/typical numbers instead.
 - Keep responses to 2-3 sentences per round.
 - Be polite but absolutely firm. Use the data.
 """
@@ -104,14 +106,16 @@ Issue: {current_issue}
 Dealer's final argument: {dealer_pushback?}
 Buyer's final counter: {buyer_counter?}
 
+You also have access to the Compliance Data: {compliance_data}
+
 TASK: Evaluate the exchange. Extract the strongest surviving counter-script
 (the buyer line that the dealer could not rebut). Determine if the dealer
 logically conceded the point based on the data presented.
 
 OUTPUT FORMAT — respond with ONLY a JSON object:
 {{
-  "winning_script": "The exact verbatim script the buyer should use.",
-  "citation": "Any specific legal or market metric cited, or null",
+  "winning_script": "The exact verbatim script the buyer should use. Scripts for different issues must be substantively different — each must name its own fee and number.",
+  "citation": "Extract the specific legal citation verbatim from the Compliance Data for this issue. Do NOT hallucinate from memory. Null if none exists in Compliance Data.",
   "conceded": true | false
 }}
 """
@@ -215,7 +219,10 @@ class NegotiationArena(BaseAgent):
         # Prepare context data for the buyer coach
         score_breakdown = json.dumps([f.model_dump() for f in score_result.factors])
         market_ref = score_result.market_ref.model_dump_json() if score_result.market_ref else "{}"
-        compliance_data = json.dumps(state.get("compliance_info", {}))
+        raw_compliance = state.get("compliance_data") or {}
+        compliance_data = (
+            raw_compliance if isinstance(raw_compliance, str) else json.dumps(raw_compliance)
+        )
         
         debates: list[IssueDebate] = []
 
@@ -272,12 +279,13 @@ class NegotiationArena(BaseAgent):
             ))
 
         # 3. Calculate counterfactual
-        # We need the original DealInput. Since scoring_agent doesn't mutate it, we should pull it from state.
-        # The finalized deal should be in state["deal_verified"] but wait, extraction puts it in `state["extracted_deal"]`.
-        deal_raw = state.get("extracted_deal")
+        # Retrieve structured deal_input saved by scoring_agent.
+        deal_raw = state.get("deal_input")
         counterfactual: ArenaCounterfactual | None = None
         
-        if deal_raw:
+        if not deal_raw:
+            yield Event(author=self.name, content=genai_types.Content(parts=[genai_types.Part(text="deal_input missing from state; skipping counterfactual score.")]))
+        else:
             try:
                 cf_deal = DealInput.model_validate(deal_raw)
                 # Strip negotiable fees
@@ -328,7 +336,7 @@ class NegotiationArena(BaseAgent):
                         estimated_savings=round(savings, 2)
                     )
             except Exception as e:
-                yield Event(author=self.name, content=genai_types.Content(parts=[genai_types.Part(text=f"Failed to compute counterfactual: {e}")]))
+                yield Event(author=self.name, content=genai_types.Content(parts=[genai_types.Part(text=f"deal_input parsing failed, skipping counterfactual: {e}")]))
 
         arena_result = ArenaResult(debates=debates, counterfactual=counterfactual)
         
