@@ -25,6 +25,7 @@ import json
 from typing import Any
 
 from google.adk.agents import LlmAgent
+from google.adk.tools import ToolContext
 
 from catchfees.schemas import (
     Addon,
@@ -42,7 +43,7 @@ from catchfees.agents.intake_guard import intake_guard_callback
 # ---------------------------------------------------------------------------
 
 
-def score_deal_tool(deal_json: str) -> str:
+def score_deal_tool(tool_context: ToolContext, deal_json: str) -> str:
     """
     Score a car deal using the deterministic 6-factor scoring engine.
 
@@ -123,6 +124,9 @@ def score_deal_tool(deal_json: str) -> str:
     # Call the deterministic scoring engine — ALL arithmetic happens here
     result = score_deal(deal)
 
+    # Deterministic results are persisted by Python, never reconstructed from LLM text.
+    tool_context.state["score_result"] = result.model_dump()
+
     # Store result as JSON for downstream agents
     return result.model_dump_json(indent=2)
 
@@ -178,7 +182,7 @@ scoring_narrator = LlmAgent(
     model="gemini-2.5-flash",
     instruction=_SCORING_INSTRUCTION,
     tools=[score_deal_tool],
-    output_key="score_result",
+    output_key="score_narrative",
     description=(
         "Calls the deterministic score_deal tool and narrates the ScoreResult "
         "in plain English. Never performs arithmetic — only interprets tool output."

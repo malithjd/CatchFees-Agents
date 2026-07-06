@@ -143,6 +143,7 @@ class Flag(BaseModel):
     title: str
     detail: str
     action: str | None = None
+    negotiable: bool = Field(default=False, description="True if this flag represents a negotiable fee or condition.")
 
 
 class NegotiationScript(BaseModel):
@@ -151,6 +152,31 @@ class NegotiationScript(BaseModel):
     issue: str = Field(..., description="Short label for what this script addresses")
     script: str = Field(..., description="Verbatim script the buyer can say at the dealership")
     source: str | None = Field(None, description="'live-listings' | 'calculated' (for price scripts)")
+
+
+class IssueDebate(BaseModel):
+    """Result of an arena debate for a single issue."""
+    
+    issue: str = Field(..., description="The flag title that was debated")
+    dealer_pushback: str = Field(..., description="The strongest argument the dealer agent made")
+    winning_script: str = Field(..., description="The best counter-script the buyer coach generated")
+    citation: str | None = Field(None, description="Any legal/market citation used in the winning script")
+    conceded: bool = Field(default=False, description="Whether the dealer conceded the point")
+
+
+class ArenaCounterfactual(BaseModel):
+    """The rescored deal assuming the buyer wins all negotiable points."""
+    
+    original_score: int
+    new_score: int
+    estimated_savings: float
+
+
+class ArenaResult(BaseModel):
+    """The final output of the negotiation arena."""
+    
+    debates: list[IssueDebate] = Field(default_factory=list)
+    counterfactual: ArenaCounterfactual | None = None
 
 
 # ---------------------------------------------------------------------------

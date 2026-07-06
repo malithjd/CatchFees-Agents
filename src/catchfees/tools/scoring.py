@@ -586,6 +586,7 @@ def _generate_flags(
                     f"for {deal.credit_tier} credit."
                 ),
                 action="Get a pre-approval from a credit union before accepting this rate.",
+                negotiable=True,
             ))
 
     # --- Doc fee ---
@@ -600,6 +601,7 @@ def _generate_flags(
                     f"of ${eff:,.0f} per {doc_fee_cap.law}. {doc_fee_cap.explanation}"
                 ),
                 action="Tell the dealer to reduce the doc fee to the legal limit.",
+                negotiable=True,
             ))
     else:
         state_data = _STATE_FEES.get(deal.state or "", {})
@@ -614,6 +616,7 @@ def _generate_flags(
                     f"${typical:,.0f} for {state_label}."
                 ),
                 action=f"Negotiate the doc fee down — the state average is around ${typical:,.0f}.",
+                negotiable=True,
             ))
         elif doc >= 500:
             red.append(Flag(
@@ -621,6 +624,7 @@ def _generate_flags(
                 title="High Documentation Fee",
                 detail=f"Doc fee of ${doc:,.0f} is significantly above the national average of $75–150.",
                 action="Negotiate the doc fee down.",
+                negotiable=True,
             ))
 
     # --- Registration fee ---
@@ -637,6 +641,7 @@ def _generate_flags(
                     f"the typical ${lo}–${hi} range for {state_label}."
                 ),
                 action="Verify this amount with your DMV. Dealers sometimes inflate registration estimates.",
+                negotiable=True,
             ))
     elif deal.reg_fee and deal.reg_fee > 500:
         red.append(Flag(
@@ -644,6 +649,7 @@ def _generate_flags(
             title="High Registration Fee",
             detail=f"Registration fee of ${deal.reg_fee:,.0f} is unusually high. Most states charge $50–$300.",
             action="Ask the dealer to itemize this fee and verify with your local DMV.",
+            negotiable=True,
         ))
 
     # --- Title fee ---
@@ -657,6 +663,7 @@ def _generate_flags(
                 f"${title_statutory:,.0f} for {state_label}."
             ),
             action="State title fees are fixed — verify this amount is correct.",
+            negotiable=True,
         ))
 
     # --- Per-addon expensive items ---
@@ -667,6 +674,7 @@ def _generate_flags(
                 title=f"Expensive Add-on: {addon.name}",
                 detail=f"{addon.name} at ${addon.price:,.0f} is unusually expensive.",
                 action="Consider removing or getting third-party coverage.",
+                negotiable=True,
             ))
 
     if total_addons > 3_000:
@@ -675,6 +683,7 @@ def _generate_flags(
             title="High Total Add-ons",
             detail=f"Total add-ons of ${total_addons:,.0f} — review each for necessity.",
             action="Remove any add-ons you didn't specifically request.",
+            negotiable=True,
         ))
 
     # --- Long loan term ---

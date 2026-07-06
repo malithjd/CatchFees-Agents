@@ -22,7 +22,7 @@ LLM-driven routing because stage order is invariant (extract → research →
 score → advise), giving reproducibility, auditability, and lower
 latency/cost; dynamic LLM decision-making is deliberately confined to
 where it adds value — inside the extraction verification loop and the
-negotiation arena. Mirror this rationale in the README architecture section.
+negotiation arena.
 
 The module-level `root_agent` variable is what `adk web` discovers when
 pointed at this directory.
@@ -36,12 +36,13 @@ from google.adk.agents import SequentialAgent
 from catchfees.agents.extraction import extraction_agent
 from catchfees.agents.research import research_agent
 from catchfees.agents.scoring_agent import scoring_narrator
+from catchfees.agents.negotiation_arena import negotiation_arena
 from catchfees.agents.financial_advisor import financial_advisor
 
 
 root_agent = SequentialAgent(
     name="catchfees",
-    sub_agents=[extraction_agent, research_agent, scoring_narrator, financial_advisor],
+    sub_agents=[extraction_agent, research_agent, scoring_narrator, negotiation_arena, financial_advisor],
     description=(
         "CatchFees Deal Analyzer — a multi-agent pipeline that extracts deal "
         "data from purchase agreement images, researches market prices and "

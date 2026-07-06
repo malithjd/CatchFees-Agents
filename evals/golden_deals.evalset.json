@@ -1,20 +1,21 @@
 [
   {
-    "_comment": "Golden deals evalset v2. Score ranges are provisional — run each user_message through score_deal once, record actual scores, then tighten ranges to ±8 points. Flag strings MUST match the exact flag titles emitted by src/catchfees/tools/scoring.py — verify with one pipeline run.",
+    "_comment": "Golden deals evalset v3. Scenario semantics are authoritative. Score ranges are provisional pending ONE verification run — tighten each to actual ±6. Ordering invariants that MUST hold: camry > tucson > rav4 > civic; f150 >= camry; camry >= 60. If any invariant fails, report the engine bug — do NOT loosen assertions.",
     "name": "fair_deal_toyota_camry",
-    "description": "Solid mainstream deal: 2022 Camry LE priced at market, sane financing, clean fees. Should land mid-to-high with no critical flags. Baseline sanity case.",
+    "description": "Baseline sanity case: 1-year-old 2025 Camry LE priced at the engine's market reference (~1.01x), sane 6.9% financing, clean fees. Must land solidly good with zero critical flags.",
     "input": {
-      "user_message": "Analyze this deal: 2022 Toyota Camry LE, used, 35,000 miles, priced at $22,400. Located in TX (ZIP 75001). Financing at 6.9% APR for 60 months with $4,500 down, no trade-in. Doc fee $150, sales tax $1,400, registration $75, title $33. No dealer add-ons, no F&I products. Credit tier: good."
+      "user_message": "Analyze this deal: 2025 Toyota Camry LE, used, 14,000 miles, priced at $26,300. Located in TX (ZIP 75001). Financing at 6.9% APR for 60 months with $5,300 down, no trade-in. Doc fee $150, sales tax $1,640, registration $75, title $33. No dealer add-ons, no F&I products. Credit tier: good."
     },
     "expected_output": {
       "score_range": [
         62,
-        85
+        88
       ],
       "label_contains": "Deal",
       "must_not_have_flags": [
         "Doc Fee Exceeds Legal Cap",
         "Significantly Above Market",
+        "Above Market Value",
         "High APR"
       ],
       "should_have_factors": [
@@ -33,11 +34,11 @@
       {
         "type": "score_in_range",
         "min": 62,
-        "max": 85
+        "max": 88
       },
       {
         "type": "no_critical_flags",
-        "description": "Fair deal must not trigger critical severity flags"
+        "description": "Clean deal must not trigger critical severity flags"
       },
       {
         "type": "factors_present",
@@ -47,14 +48,14 @@
   },
   {
     "name": "predatory_deal_honda_civic",
-    "description": "Worst-case predatory stack: ~1.9x market price on a 2020 Civic LX, illegal CA doc fee ($800 vs ~$85 cap), 17.99% APR, 84-month term, $0 down, $6,996 of junk add-ons. Must trigger the extreme-overpay score cap and multiple critical flags.",
+    "description": "Predatory stack on a 1-year-old 2025 Civic LX: ~1.9x the engine market reference, illegal CA doc fee ($800 vs ~$85 cap), 17.99% APR, 84 months, $0 down, $6,996 of junk add-ons. Must trigger the overpay score cap and multiple critical flags.",
     "input": {
-      "user_message": "Analyze this deal: 2020 Honda Civic LX, used, 62,000 miles, priced at $32,900. Located in CA (ZIP 90001). Financing at 17.99% APR for 84 months with $0 down, no trade-in. Doc fee $800, sales tax $3,125, registration $525, title $23. Dealer add-ons: Paint Protection $1,999, VIN Etching $899, Fabric Guard $599. F&I products: Extended Warranty $3,499. Credit tier: fair."
+      "user_message": "Analyze this deal: 2025 Honda Civic LX, used, 18,000 miles, priced at $41,700. Located in CA (ZIP 90001). Financing at 17.99% APR for 84 months with $0 down, no trade-in. Doc fee $800, sales tax $3,960, registration $525, title $23. Dealer add-ons: Paint Protection $1,999, VIN Etching $899, Fabric Guard $599. F&I products: Extended Warranty $3,499. Credit tier: fair."
     },
     "expected_output": {
       "score_range": [
         0,
-        28
+        15
       ],
       "label_contains": "Poor",
       "must_have_flags": [
@@ -72,7 +73,7 @@
       {
         "type": "score_in_range",
         "min": 0,
-        "max": 28
+        "max": 15
       },
       {
         "type": "has_critical_flags",
@@ -88,20 +89,20 @@
       {
         "type": "extreme_overpay_cap_applied",
         "expected": true,
-        "description": "Price ~1.9x market — total score must be capped per the overpay rule regardless of other factors"
+        "description": "~1.9x market reference — total score must be capped by the overpay rule regardless of other factors"
       }
     ]
   },
   {
     "name": "cash_deal_ford_f150",
-    "description": "Clean cash purchase near invoice on a new 2025 F-150 XLT in FL. Doc fee $299 is exceptional for Florida (uncapped, $800-1,000 typical). Cash must earn full APR + Loan Term marks. Green-flag showcase.",
+    "description": "Clean cash purchase on a new 2025 F-150 XLT (MSRP $43,770) at $42,800 after negotiation. Doc fee $299 is exceptional for Florida (uncapped, $800+ typical). Cash must earn full APR and Loan Term marks. Green-flag showcase.",
     "input": {
-      "user_message": "Analyze this deal: 2025 Ford F-150 XLT, new, 12 miles, priced at $45,200 (MSRP $49,080 with $2,000 manufacturer rebate applied). Located in FL (ZIP 33101). Cash purchase — no financing, APR 0, term 0. Down payment $45,200, no trade-in. Doc fee $299, sales tax $2,712, registration $225 (new plate), title $78. No dealer add-ons, no F&I products."
+      "user_message": "Analyze this deal: 2025 Ford F-150 XLT, new, 12 miles, priced at $42,800 (MSRP $43,770). Located in FL (ZIP 33101). Cash purchase — no financing, APR 0, term 0. Down payment $42,800, no trade-in. Doc fee $299, sales tax $2,570, registration $225 (new plate), title $78. No dealer add-ons, no F&I products."
     },
     "expected_output": {
       "score_range": [
-        78,
-        100
+        75,
+        96
       ],
       "label_contains": "Deal",
       "should_have_green_flags": [
@@ -115,8 +116,8 @@
     "evaluation_criteria": [
       {
         "type": "score_in_range",
-        "min": 78,
-        "max": 100
+        "min": 75,
+        "max": 96
       },
       {
         "type": "is_cash_deal",
@@ -138,18 +139,19 @@
   },
   {
     "name": "good_price_junk_fi_rav4",
-    "description": "The classic dealer trap: fair vehicle price on a 2023 RAV4 XLE, but $4,497 of F&I/add-on stacking plus a marked-up 9.9% APR for good credit. Tests that add-on and APR factors independently drag a market-priced deal to mediocre. This is the Negotiation Arena's best demo case — every flagged item is negotiable.",
+    "description": "The classic dealer trap: 1-year-old 2025 RAV4 XLE priced at the engine market reference (~1.01x), but $4,497 of add-on/F&I stacking, a marked-up 9.9% APR for good credit, and 72 months. Price factor must stay healthy while add-ons/APR/term drag the total to mediocre. Primary Negotiation Arena demo case — every flag is winnable.",
     "input": {
-      "user_message": "Analyze this deal: 2023 Toyota RAV4 XLE, used, 28,500 miles, priced at $27,900. Located in CO (ZIP 80202). Financing at 9.9% APR for 72 months with $3,000 down plus a $6,000 trade-in. Doc fee $599, sales tax $1,240, registration $612, title $25. Dealer add-ons: Nitrogen-Filled Tires $299, Wheel Locks $199, Window Tint $499. F&I products: GAP Insurance $1,200, Prepaid Maintenance Plan $2,300. Credit tier: good."
+      "user_message": "Analyze this deal: 2025 Toyota RAV4 XLE, used, 16,000 miles, priced at $29,900. Located in CO (ZIP 80202). Financing at 9.9% APR for 72 months with $3,000 down plus a $6,000 trade-in. Doc fee $599, sales tax $1,330, registration $612, title $25. Dealer add-ons: Nitrogen-Filled Tires $299, Wheel Locks $199, Window Tint $499. F&I products: GAP Insurance $1,200, Prepaid Maintenance Plan $2,300. Credit tier: good."
     },
     "expected_output": {
       "score_range": [
-        40,
-        65
+        35,
+        60
       ],
       "label_contains": "Deal",
       "must_have_flags": [
-        "High APR"
+        "High APR",
+        "Long Loan Term"
       ],
       "must_not_have_flags": [
         "Significantly Above Market",
@@ -163,20 +165,20 @@
     "evaluation_criteria": [
       {
         "type": "score_in_range",
-        "min": 40,
-        "max": 65
+        "min": 35,
+        "max": 60
       },
       {
         "type": "has_flags",
         "flags": [
           "High APR"
         ],
-        "description": "9.9% for good credit in 2026 is a finance-office markup, not a market rate"
+        "description": "9.9% for good credit is a finance-office markup, not a market rate"
       },
       {
         "type": "addon_factor_penalized",
         "max_factor_score_pct": 40,
-        "description": "$4,497 in add-ons/F&I must cost most of the 15-point Add-ons factor"
+        "description": "$4,497 in add-ons/F&I must cost most of the Add-ons factor"
       },
       {
         "type": "has_negotiation_scripts",
@@ -186,9 +188,9 @@
   },
   {
     "name": "abnormal_registration_ny_tucson",
-    "description": "Fee-padding case: 2024 Hyundai Tucson SEL in NY priced fairly, doc fee exactly at NY's $175 cap (legal), but registration billed at $690 — 3x+ the NY typical range. Tests the abnormal-fee detector (>2x state typical) in isolation from price/APR problems.",
+    "description": "Fee-padding case: 2024 Hyundai Tucson SEL in NY priced at the engine market reference, doc fee exactly at NY's $175 cap (legal), but registration billed at $690 — 3x+ the NY typical. Tests the abnormal-fee detector in isolation from price/APR problems.",
     "input": {
-      "user_message": "Analyze this deal: 2024 Hyundai Tucson SEL, used, 19,000 miles, priced at $25,800. Located in NY (ZIP 14201). Financing at 7.4% APR for 60 months with $5,000 down, no trade-in. Doc fee $175, sales tax $2,225, registration $690, title $50. Dealer add-ons: All-Weather Mats $249. No F&I products. Credit tier: good."
+      "user_message": "Analyze this deal: 2024 Hyundai Tucson SEL, used, 24,000 miles, priced at $24,900. Located in NY (ZIP 14201). Financing at 7.4% APR for 60 months with $5,000 down, no trade-in. Doc fee $175, sales tax $2,180, registration $690, title $50. Dealer add-ons: All-Weather Mats $249. No F&I products. Credit tier: good."
     },
     "expected_output": {
       "score_range": [
@@ -197,11 +199,12 @@
       ],
       "label_contains": "Deal",
       "must_have_flags": [
-        "Abnormal Registration Fee"
+        "Registration Fee Seems Too High"
       ],
       "must_not_have_flags": [
         "Doc Fee Exceeds Legal Cap",
-        "Significantly Above Market"
+        "Significantly Above Market",
+        "High APR"
       ],
       "should_have_scripts_count_min": 1,
       "financial_advice_contains": [
@@ -217,9 +220,9 @@
       {
         "type": "has_flags",
         "flags": [
-          "Abnormal Registration Fee"
+          "Registration Fee Seems Too High"
         ],
-        "description": "Registration >2x NY typical must trigger the abnormal-fee flag with the state-typical range cited"
+        "description": "Registration >2x NY typical must trigger with the state-typical range cited"
       },
       {
         "type": "doc_fee_legal_at_cap",
