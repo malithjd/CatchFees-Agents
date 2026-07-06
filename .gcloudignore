@@ -9,7 +9,7 @@ web/node_modules
 tests
 evals
 docs
-*.md
+
 !README.md
 .env
 .env.*
