@@ -24,6 +24,7 @@ import sys
 from pathlib import Path
 
 from google.adk.agents import LlmAgent, ParallelAgent
+from catchfees.models import REASONING_MODEL
 from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp.client.stdio import StdioServerParameters
@@ -71,7 +72,7 @@ RULES:
 
 market_agent = LlmAgent(
     name="market_agent",
-    model="gemini-2.5-flash",
+    model=REASONING_MODEL,
     instruction=_MARKET_INSTRUCTION,
     tools=[autodev_listings, msrp_lookup],
     output_key="market_data",
@@ -156,7 +157,7 @@ def _build_compliance_agent() -> LlmAgent:
 
     return LlmAgent(
         name="compliance_agent",
-        model="gemini-2.5-flash",
+        model=REASONING_MODEL,
         instruction=_COMPLIANCE_INSTRUCTION,
         tools=[mcp_tools],
         output_key="compliance_data",

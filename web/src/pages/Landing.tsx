@@ -17,17 +17,17 @@ export default function Landing() {
         minHeight: '80vh'
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ 
-            fontSize: '1rem', 
-            fontWeight: 600, 
-            letterSpacing: '2px', 
-            textTransform: 'uppercase', 
+          <p style={{
+            fontSize: '1rem',
+            fontWeight: 600,
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
             color: '#8a96a8',
             marginBottom: '1.5rem'
           }}>
             CatchFees · Multi-Agent Deal Analyzer
           </p>
-          
+
           <h1 style={{
             fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
             fontWeight: 900,
@@ -38,7 +38,7 @@ export default function Landing() {
           }}>
             The car-buying copilot for introverts.
           </h1>
-          
+
           <p style={{
             fontSize: '1.25rem',
             lineHeight: 1.6,
@@ -49,7 +49,7 @@ export default function Landing() {
             Hate haggling? Five AI agents read the fine print, check the law in your state, and argue with the dealer — so you never have to say a word.
           </p>
 
-          <button 
+          <button
             onClick={() => navigate('/analyze')}
             className="neo-button neo-button-primary"
             style={{
@@ -73,7 +73,7 @@ export default function Landing() {
               <p style={{ color: '#5a6678', fontSize: '0.9rem' }}>$4,500 in overpriced fees found.</p>
             </div>
           </div>
-          
+
           <div className="neo-card-recessed" style={{ padding: '1rem', marginBottom: '1.5rem', borderLeft: '4px solid var(--error-color)' }}>
             <h4 style={{ color: 'var(--error-color)', marginBottom: '0.5rem' }}>Illegal Doc Fee</h4>
             <p style={{ fontSize: '0.9rem', color: '#5a6678' }}>Dealer charged $599. State cap is $150.</p>
@@ -96,10 +96,10 @@ export default function Landing() {
       {/* How it Works Strip */}
       <section style={{ maxWidth: '1200px', margin: '4rem auto', padding: '0 2rem' }}>
         <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '3rem' }}>How it works</h2>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-          gap: '2rem' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '2rem'
         }}>
           <div className="neo-card" style={{ textAlign: 'center', padding: '2rem' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', boxShadow: 'var(--neo-inset)', margin: '0 auto 1.5rem auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-color)' }}>1</div>
@@ -109,7 +109,7 @@ export default function Landing() {
           <div className="neo-card" style={{ textAlign: 'center', padding: '2rem' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', boxShadow: 'var(--neo-inset)', margin: '0 auto 1.5rem auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-color)' }}>2</div>
             <h3 style={{ marginBottom: '1rem' }}>Market & Law Check</h3>
-            <p style={{ color: '#5a6678', fontSize: '0.95rem' }}>Agents simultaneously check live market prices and verify state fee limits.</p>
+            <p style={{ color: '#5a6678', fontSize: '0.95rem' }}>Agents simultaneously check live market prices and verify state fee limits via MCP.</p>
           </div>
           <div className="neo-card" style={{ textAlign: 'center', padding: '2rem' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', boxShadow: 'var(--neo-inset)', margin: '0 auto 1.5rem auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-color)' }}>3</div>

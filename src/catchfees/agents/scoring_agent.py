@@ -27,6 +27,8 @@ from typing import Any
 from google.adk.agents import LlmAgent
 from google.adk.tools import ToolContext
 
+from catchfees.models import REASONING_MODEL
+
 from catchfees.schemas import (
     Addon,
     Condition,
@@ -182,7 +184,7 @@ RULES:
 
 scoring_narrator = LlmAgent(
     name="scoring_narrator",
-    model="gemini-2.5-flash",
+    model=REASONING_MODEL,
     instruction=_SCORING_INSTRUCTION,
     tools=[score_deal_tool],
     output_key="score_narrative",

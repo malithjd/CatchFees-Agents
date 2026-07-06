@@ -35,6 +35,7 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
 from catchfees.agents.intake_guard import intake_guard_callback
+from catchfees.models import REASONING_MODEL
 
 _FINANCIAL_ADVISOR_INSTRUCTION = """\
 You are a seasoned, OBJECTIVE financial advisor specializing in automotive purchases.
@@ -125,7 +126,7 @@ RULES:
 
 financial_advisor = LlmAgent(
     name="financial_advisor",
-    model="gemini-2.5-flash",
+    model=REASONING_MODEL,
     instruction=_FINANCIAL_ADVISOR_INSTRUCTION,
     tools=[google_search],
     output_key="financial_advice",

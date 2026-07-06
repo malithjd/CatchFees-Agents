@@ -27,6 +27,7 @@ from google.adk.sessions import Session
 from google.genai import types as genai_types
 
 from catchfees.agents.intake_guard import intake_guard_callback
+from catchfees.models import FAST_MODEL, REASONING_MODEL
 from catchfees.schemas import ArenaCounterfactual, ArenaResult, DealInput, IssueDebate, ScoreResult
 from catchfees.tools.scoring import _score_factors, _apply_overpay_cap
 
@@ -56,7 +57,8 @@ RULES:
 
 dealer_agent = LlmAgent(
     name="dealer_agent",
-    model="gemini-2.5-flash",
+    # Adversarial roleplay, no accuracy requirement — cheapest model, highest call volume.
+    model=FAST_MODEL,
     instruction=_DEALER_INSTRUCTION,
     output_key="dealer_pushback",
     description="Simulates a veteran dealership F&I manager defending fees.",
@@ -91,7 +93,8 @@ RULES:
 
 buyer_coach_agent = LlmAgent(
     name="buyer_coach_agent",
-    model="gemini-2.5-flash",
+    # Must cite statutes verbatim — keep the stronger reasoning model.
+    model=REASONING_MODEL,
     instruction=_BUYER_COACH_INSTRUCTION,
     output_key="buyer_counter",
     description="Simulates a buyer coach armed with data to counter the dealer.",
@@ -122,7 +125,8 @@ OUTPUT FORMAT — respond with ONLY a JSON object:
 
 referee_agent = LlmAgent(
     name="referee_agent",
-    model="gemini-2.5-flash",
+    # Extracts the citation verbatim from compliance data — keep reasoning model.
+    model=REASONING_MODEL,
     instruction=_REFEREE_INSTRUCTION,
     output_key="referee_result",
     description="Evaluates the debate and extracts the winning script.",

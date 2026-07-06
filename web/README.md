@@ -4,8 +4,8 @@ This is the Vite + React SPA for the CatchFees Agent platform.
 
 ## Architecture
 - Single Page Application
-- No routing libraries (uses smooth scrolling between sections)
-- Pure React State (no external stores)
+- `react-router-dom` with two routes: `/` (Landing) and `/analyze` (Analyze)
+- Pure React state (no external stores); the `/analyze` view consumes the backend SSE stream
 - Strict Neumorphic design system with plain CSS
 
 ## Development

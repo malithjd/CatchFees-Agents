@@ -30,6 +30,8 @@ import json
 from typing import Any
 
 from google.adk.agents import LlmAgent, LoopAgent, BaseAgent, Agent
+
+from catchfees.models import VISION_MODEL, REASONING_MODEL
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event, EventActions
 from google.genai import types as genai_types
@@ -96,7 +98,7 @@ and re-extract them carefully.
 
 extractor = LlmAgent(
     name="extractor",
-    model="gemini-2.5-flash",
+    model=VISION_MODEL,
     instruction=_EXTRACTOR_INSTRUCTION,
     output_key="extracted_deal",
     description=(
@@ -156,7 +158,7 @@ specific problems in issues, with correction_notes for the extractor.
 
 verifier = LlmAgent(
     name="verifier",
-    model="gemini-2.5-flash",
+    model=REASONING_MODEL,
     instruction=_VERIFIER_INSTRUCTION,
     tools=[vin_checksum, nhtsa_decode],
     output_key="verification_result",

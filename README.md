@@ -16,7 +16,7 @@ cp .env.example src/catchfees/.env   # add GOOGLE_API_KEY
 uv run adk web src/catchfees          # ADK dev UI at :8000
 uv run uvicorn --app-dir src catchfees.server:app --port 8080
                                       # API + built web UI at :8080
-uv run pytest                         # full suite (147 tests)
+uv run pytest                         # full suite (149 passing, 1 skipped)
 ```
 *Note: `AUTO_DEV_API_KEY` is optional. Without it, the agent degrades gracefully: it falls back to a bundled MSRP depreciation model instead of live market listings for its price reference.*
 
@@ -79,17 +79,19 @@ graph TD
 
 | Stage | Agent Type | Tools | State Keys Written/Read |
 | :--- | :--- | :--- | :--- |
-| **Extraction** | `LoopAgent` | `extract_deal_terms`, `request_missing_info` | Writes: `deal_input` |
-| **Research** | `ParallelAgent` | `check_market_price`, `check_doc_fee_cap` | Reads: `deal_input`<br>Writes: `market_ref`, `doc_fee_cap` |
-| **Scoring** | `BaseAgent` | `score_deal` | Reads: `deal_input`, `market_ref`, `doc_fee_cap`<br>Writes: `score_result` |
-| **Negotiation** | `LoopAgent` | `run_debate` | Reads: `score_result`<br>Writes: `arena_result` |
-| **Advice** | `BaseAgent` | (None) | Reads: `score_result`, `arena_result` |
+| **Extraction** | `LoopAgent` (extractor → verifier → escalation checker) | `vin_checksum`, `nhtsa_decode` | Writes: `extracted_deal`, `verification_result`, `deal_verified`, `unresolved_fields`, `correction_notes` |
+| **Research** | `ParallelAgent` (market + compliance) | `autodev_listings`, `msrp_lookup`, `auto_consumer_law` MCP | Reads: `extracted_deal`<br>Writes: `market_data`, `compliance_data` |
+| **Scoring** | `LlmAgent` (`scoring_narrator`) | `score_deal_tool` | Reads: `extracted_deal`<br>Writes: `deal_input`, `score_result`, `score_narrative` |
+| **Negotiation** | `BaseAgent` orchestrating a `LoopAgent` (dealer / coach / referee) | `score_deal` (counterfactual) | Reads: `score_result`, `deal_input`, `compliance_data`<br>Writes: `arena_result` |
+| **Advice** | `LlmAgent` (`financial_advisor`) | `google_search` | Reads: `extracted_deal`, `market_data`, `compliance_data`, `score_result`<br>Writes: `financial_advice` |
+
+The deterministic `score_deal_tool` writes both `deal_input` and `score_result` to session state as structured Python data; downstream agents consume those keys as strict data and never reconstruct them from LLM prose.
 
 ---
 
 ## Serving Layer
 
-The backend uses a FastAPI server wrapping the ADK `InMemoryRunner`. It streams agent execution steps to the frontend via Server-Sent Events (SSE) using custom event types (`agent_step`, `done`, `quarantined`, `stream_error`). The Vite + React web UI consumes these streams in two modes: a calm "Consumer Mode" featuring a 5-stage progress stepper, and a toggleable "Nerd Mode" revealing the live agent feed and arena debate logic. SSE is necessary because the full multi-agent pipeline takes 60–90 seconds to run, and the UI must keep the user engaged by narrating the internal state machine live.
+The backend uses a FastAPI server wrapping the ADK `InMemoryRunner`. It streams agent execution steps to the frontend via Server-Sent Events (SSE): `agent_step` messages narrate each stage, a terminal `done` message carries the final report (`score_result`, `arena_result`, `score_narrative`, `financial_advice`), and an `error` event surfaces failures. The Vite + React web UI consumes these streams in two modes: a calm "Consumer Mode" featuring a 5-stage progress stepper, and a toggleable "Nerd Mode" revealing the live agent feed and arena debate logic. SSE is necessary because the full multi-agent pipeline takes 60–90 seconds to run, and the UI must keep the user engaged by narrating the internal state machine live.
 
 ---
 
@@ -112,7 +114,7 @@ Instead of passively listing red flags, the `negotiation_arena` agent runs a str
 
 *Example Transcript:*
 > **Dealer:** "That $800 doc fee is pre-printed on all our forms. We literally can't change it, state law requires we charge everyone the same."
-> **Coach:** "Actually, under CA Vehicle Code 29841, the maximum allowed documentation fee is $85. I'll need a revised contract with the legal cap applied."
+> **Coach:** "Actually, under CA Civil Code §4456.5, the maximum allowed documentation fee is $85. I'll need a revised contract with the legal cap applied."
 
 ---
 
@@ -134,10 +136,10 @@ The system is evaluated against a 5-case golden dataset ensuring the determinist
 | **good_price_junk_fi_rav4** | 35 – 60 | High APR, Long Loan Term |
 | **abnormal_registration_ny_tucson**| 55 – 80 | Registration Fee Seems Too High |
 
-**Test Coverage (147 total passing tests):**
+**Test Coverage (150 total: 149 passing, 1 skipped):**
 - Tools & MCP: 44 tests
-- Arena Handoff & Logic: 3 tests
-- Market Analysis: 10 tests (1 skipped)
+- Arena Handoff & Logic: 6 tests
+- Market Analysis: 11 tests (1 skipped)
 - Scoring Engine: 67 tests
 - Security: 6 tests
 - Server: 4 tests
