@@ -11,6 +11,7 @@ tests
 evals
 docs
 *.md
+!README.md
 .env
 .env.*
 !.env.example
