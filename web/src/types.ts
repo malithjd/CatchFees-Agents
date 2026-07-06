@@ -15,4 +15,9 @@ export interface QuarantineEvent {
   reason: string;
 }
 
-export type AppEvent = AgentStepEvent | DoneEvent | QuarantineEvent;
+export interface StreamErrorEvent {
+  type: 'stream_error';
+  message: string;
+}
+
+export type AppEvent = AgentStepEvent | DoneEvent | QuarantineEvent | StreamErrorEvent;

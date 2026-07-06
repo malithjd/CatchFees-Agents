@@ -77,6 +77,8 @@ export function UploadPanel({ onEvent, onClear, isProcessing }: UploadPanelProps
       const decoder = new TextDecoder();
       let buffer = '';
 
+      let finished = false;
+
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
@@ -84,7 +86,6 @@ export function UploadPanel({ onEvent, onClear, isProcessing }: UploadPanelProps
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         
-        // Keep the last partial line in the buffer
         buffer = lines.pop() || '';
 
         for (const line of lines) {
@@ -94,6 +95,9 @@ export function UploadPanel({ onEvent, onClear, isProcessing }: UploadPanelProps
               try {
                 const event = JSON.parse(dataStr) as AppEvent;
                 onEvent(event);
+                if (event.type === 'done' || event.type === 'quarantined') {
+                  finished = true;
+                }
               } catch (err) {
                 console.error("Failed to parse event", dataStr, err);
               }
@@ -101,9 +105,12 @@ export function UploadPanel({ onEvent, onClear, isProcessing }: UploadPanelProps
           }
         }
       }
+      if (!finished) {
+        onEvent({ type: 'stream_error', message: 'Stream ended without completing' });
+      }
     } catch (err) {
       console.error(err);
-      alert("An error occurred during analysis.");
+      onEvent({ type: 'stream_error', message: err instanceof Error ? err.message : 'An error occurred during analysis.' });
     }
   };
 
@@ -147,7 +154,26 @@ export function UploadPanel({ onEvent, onClear, isProcessing }: UploadPanelProps
               onChange={handleFileChange}
             />
             {images.length > 0 ? (
-              <p>{images.length} image(s) selected.</p>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {images.map((img, idx) => {
+                  const objUrl = URL.createObjectURL(img);
+                  return (
+                    <div key={idx} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                      <img src={objUrl} alt={`upload-${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', boxShadow: 'var(--neo-shadow-sm)' }} />
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setImages(prev => prev.filter((_, i) => i !== idx));
+                        }}
+                        style={{ position: 'absolute', top: '-8px', right: '-8px', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--error-color)', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 'bold' }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <p>Drag & drop up to 5 images here, or click to browse</p>
             )}

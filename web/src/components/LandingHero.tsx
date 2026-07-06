@@ -61,7 +61,7 @@ export function LandingHero() {
           marginBottom: '2rem',
           color: 'var(--text-ink)'
         }}>
-          The dealer has a team.<br />Now you do too.
+          The car-buying copilot for introverts.
         </h1>
         
         <p style={{
@@ -72,7 +72,7 @@ export function LandingHero() {
           maxWidth: '600px',
           margin: '0 auto 3rem auto'
         }}>
-          Five AI agents read your purchase agreement, check the law in your state, score the deal — then argue with a virtual dealer so you don't have to.
+          Hate haggling? Five AI agents read the fine print, check the law in your state, and argue with the dealer — so you never have to say a word.
         </p>
 
         <button 

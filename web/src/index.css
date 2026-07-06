@@ -32,15 +32,15 @@
   /* Radii */
   --radius-sm: 12px;
   --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-lg: 20px;
   --radius-round: 50%;
   
   /* Spacing */
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 2rem;
-  --space-lg: 4rem;
-  --space-xl: 8rem;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 96px;
 }
 
 * {
@@ -53,9 +53,20 @@ body {
   background-color: var(--bg-color);
   color: var(--text-ink);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  letter-spacing: -0.03em;
+}
+
+label, .label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 /* Utilities */
@@ -130,14 +141,38 @@ body {
 
 /* Layouts */
 .app-section {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
   margin-top: var(--space-lg);
 }
 
-@media (min-width: 1024px) {
-  .app-section {
-    grid-template-columns: 1fr 1fr;
-  }
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-color) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    var(--bg-color) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-animation 2s infinite linear;
+}
+
+@keyframes shimmer-animation {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 197, 24, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(245, 197, 24, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 197, 24, 0); }
+}
+
+.pulsing-dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
 }
