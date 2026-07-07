@@ -4,7 +4,7 @@ The car-buying copilot for introverts: a multi-agent system that reads purchase 
 
 This repository is an agentic rebuild of [catchfees.com](https://catchfees.com) (a deployed production tool) built for the [Kaggle Vibe Coding Capstone](https://www.kaggle.com/competitions/gemini-vibe-coding-capstone).
 
-**Live demo:** [DEMO_URL] · **Video walkthrough:** [VIDEO_URL]
+**Live demo:** [DEMO_URL](https://catchfees-api-322940889603.us-central1.run.app/) · **Video walkthrough:** [VIDEO_URL](https://youtu.be/UeiN6Ak30G0)
 
 ---
 
@@ -56,26 +56,7 @@ The production pipeline was constrained by static parsing and rigid templates. T
 
 ## Architecture
 
-```mermaid
-graph TD
-    User[User Input] --> Intake[Intake Guard]
-    Intake --> Extract((Extraction Agent\nLoop))
-    
-    Extract --> Parallel
-    
-    subgraph Parallel Research
-        Market((Market Agent))
-        Compliance((Compliance Agent))
-    end
-    
-    Parallel --> Scorer((Scoring Narrator\nAgent))
-    Scorer --> Arena((Negotiation Arena\nLoop))
-    Arena --> Advisor((Financial Advisor\nAgent))
-    
-    Market --> AutoDev[Live Listings API]
-    Compliance -.-> MCP[auto_consumer_law MCP Server]
-    Scorer --> ScoreEngine[Deterministic Score Tool]
-```
+![Architecture](web/assets/SystemArch.png)
 
 | Stage | Agent Type | Tools | State Keys Written/Read |
 | :--- | :--- | :--- | :--- |
@@ -128,13 +109,13 @@ The system treats all extracted document text as untrusted input. Before reachin
 
 The system is evaluated against a 5-case golden dataset ensuring the deterministic scoring engine accurately discriminates deal quality across edge cases:
 
-| Case | Score Range | Key Flags |
-| :--- | :--- | :--- |
-| **fair_deal_toyota_camry** | 62 – 88 | *None* (Clean) |
-| **predatory_deal_honda_civic** | 0 – 15 | Doc Fee Exceeds Legal Cap, High APR, Long Loan Term, Significantly Above Market |
-| **cash_deal_ford_f150** | 75 – 96 | Minimal Add-ons (Green Flag) |
-| **good_price_junk_fi_rav4** | 35 – 60 | High APR, Long Loan Term |
-| **abnormal_registration_ny_tucson**| 55 – 80 | Registration Fee Seems Too High |
+| Golden deal | Character | Score | Expected (GroundTruths) |
+|---|---|---:|---:|
+| Clean cash F-150 | New, near-invoice, minimal fees | 87 | 75–96 |
+| Fair Camry | Market price, sane financing | 70 | 62–88 |
+| Fee-padded Tucson | Legal doc fee, 3× registration | 67 | 55–80 |
+| Junk-F&I RAV4 | Fair price, $4,497 add-on stack | 4 | 35–60 |
+| Predatory Civic | 1.9× market, illegal doc fee, 17.99% APR | 0 | 0–15 |
 
 **Test Coverage (150 total: 149 passing, 1 skipped):**
 - Tools & MCP: 44 tests
