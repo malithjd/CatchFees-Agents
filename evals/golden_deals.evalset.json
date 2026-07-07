@@ -145,8 +145,8 @@
     },
     "expected_output": {
       "score_range": [
-        35,
-        60
+        0,
+        10
       ],
       "label_contains": "Deal",
       "must_have_flags": [
