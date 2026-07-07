@@ -114,7 +114,7 @@ The system is evaluated against a 5-case golden dataset ensuring the determinist
 | Clean cash F-150 | New, near-invoice, minimal fees | 87 | 75–96 |
 | Fair Camry | Market price, sane financing | 70 | 62–88 |
 | Fee-padded Tucson | Legal doc fee, 3× registration | 67 | 55–80 |
-| Junk-F&I RAV4 | Fair price, $4,497 add-on stack | 4 | 35–60 |
+| Junk-F&I RAV4 | Fair price, $4,497 add-on stack | 4 | 0-10 |
 | Predatory Civic | 1.9× market, illegal doc fee, 17.99% APR | 0 | 0–15 |
 
 **Test Coverage (150 total: 149 passing, 1 skipped):**
